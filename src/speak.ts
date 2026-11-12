@@ -1,6 +1,7 @@
 // Озвучка арабского текста.
 // В Android-приложении — системный синтез речи (движок по умолчанию; нужен арабский голос,
 // лучше всего «Синтезатор речи Google»). На сайте — голос браузера (Web Speech API).
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { getState } from './store';
 
 type Native = {
@@ -12,11 +13,10 @@ type Native = {
 };
 
 export const isNative = () => !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
-let native: Native | null = null;
-async function nativeTts(): Promise<Native | null> {
-  if (!isNative()) return null;
-  if (!native) native = (await import('@capacitor-community/text-to-speech')).TextToSpeech as unknown as Native;
-  return native;
+// ВАЖНО: плагин Capacitor — это Proxy, у которого есть «метод» then. Его нельзя возвращать из async-функции
+// и нельзя писать await plugin: JavaScript примет его за Promise и будет ждать вечно (звук молчит без ошибки).
+function nativeTts(): Native | null {
+  return isNative() ? (TextToSpeech as unknown as Native) : null;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -131,14 +131,14 @@ async function speakWeb(text: string, rate: number) {
 export async function speak(text: string, speed: SpeakSpeed = 'normal') {
   const base = getState().profile.rate || 0.9;
   const rate = speed === 'slow' ? base * 0.6 : base;
-  const n = await nativeTts();
+  const n = nativeTts();
   if (n) return speakNative(n, text, rate);
   return speakWeb(text, rate);
 }
 
 /** Есть ли арабский голос (для подсказки «установите арабский голос»). */
 export async function hasArabicVoice(): Promise<boolean> {
-  const n = await nativeTts();
+  const n = nativeTts();
   if (n) {
     for (let i = 0; i < 4; i++) {
       try {
@@ -158,7 +158,7 @@ export async function hasArabicVoice(): Promise<boolean> {
 /** Сведения для блока «Диагностика звука» в настройках. */
 export async function voiceInfo(): Promise<string[]> {
   const out: string[] = [isNative() ? 'Android app' : 'Web: ' + navigator.userAgent.replace(/\).*$/, ')')];
-  const n = await nativeTts();
+  const n = nativeTts();
   if (n) {
     try {
       const { languages } = await n.getSupportedLanguages();
@@ -179,7 +179,7 @@ export async function voiceInfo(): Promise<string[]> {
 
 /** Открыть установку голосовых данных (Android). */
 export async function installVoice() {
-  const n = await nativeTts();
+  const n = nativeTts();
   if (n) await n.openInstall();
 }
 
