@@ -1,0 +1,59 @@
+# Android-приложение (APK): собирается при каждом push в main и публикуется
+# в релиз «apk-latest» — постоянная ссылка на скачивание:
+# https://github.com/bohirturaev1991-wq/arabcha/releases/download/apk-latest/arabcha.apk
+# (Сайт публикуется командой `npm run deploy` в ветку gh-pages.)
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/arabcha.p12"
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/arabcha.p12" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Нет секрета ANDROID_KEYSTORE_B64 — APK подписан временным ключом"
+          fi
+      - name: Build APK
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: Publish APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk arabcha.apk
+          gh release delete apk-latest --yes --cleanup-tag || true
+          NOTES="Скачайте arabcha.apk на телефон и откройте. Android может попросить разрешить установку из этого источника. Версия 1.0.${GITHUB_RUN_NUMBER} (build=${GITHUB_RUN_NUMBER}), коммит ${GITHUB_SHA::7}."
+          gh release create apk-latest arabcha.apk --title "Android-приложение (последняя версия)" --notes "$NOTES"
