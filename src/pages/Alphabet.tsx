@@ -1,9 +1,9 @@
 import { useStore, setState } from '../store';
 import { useT } from '../i18n';
-import { Ar, Play, Tr, VoiceCheck } from '../components';
+import { Ar, Play, Tr, VoiceCheck, say } from '../components';
 import { EXTRA, LETTERS, forms, syllables, type Letter } from '../data/letters';
 import { href } from '../router';
-import { speak } from '../speak';
+
 
 export default function Alphabet() {
   const { t } = useT();
@@ -57,7 +57,7 @@ export function LetterPage({ id }: { id: string }) {
   return (
     <div className="page letter-page">
       <div className="card letter-hero">
-        <button className="letter-big" onClick={() => speak(l.name)} aria-label={t('listen')}>
+        <button className="letter-big" onClick={() => say(l.name)} aria-label={t('listen')}>
           <Ar size={110}>{l.ar}</Ar>
         </button>
         <div className="letter-name">
@@ -95,7 +95,7 @@ export function LetterPage({ id }: { id: string }) {
           <h2>{t('syllables')}</h2>
           <div className="syl-grid" dir="rtl">
             {syl.map((s) => (
-              <button key={s.ar} className="syl card" onClick={() => speak(s.ar, 'slow')}>
+              <button key={s.ar} className="syl card" onClick={() => say(s.ar, 'slow')}>
                 <Ar size={38}>{s.ar}</Ar>
                 <span dir="ltr">
                   <Tr latin={s.tr} />

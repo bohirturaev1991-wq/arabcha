@@ -97,6 +97,22 @@ const dict = {
   again2: { uz: 'Yana', ru: 'Ещё раз' },
   finish: { uz: 'Yakunlash', ru: 'Завершить' },
   question: { uz: 'Savol', ru: 'Вопрос' },
+  // ошибки звука
+  err_noArabic: {
+    uz: 'Telefonda arab ovozi yoʻq. Sozlamalar → Maxsus imkoniyatlar → Matnni nutqqa aylantirish: “Google nutq sintezatori”ni tanlang va arab tilini yuklab oling.',
+    ru: 'На телефоне нет арабского голоса. Настройки → Спец. возможности → Синтез речи: выберите «Синтезатор речи Google» и скачайте арабский язык.',
+  },
+  err_noArabicWeb: {
+    uz: 'Bu brauzerda arab ovozi yoʻq. Chrome’da oching yoki Android ilovasini oʻrnating.',
+    ru: 'В этом браузере нет арабского голоса. Откройте сайт в Chrome или установите Android-приложение.',
+  },
+  err_notReady: { uz: 'Ovoz dvigateli hali ishga tushmadi — bir oz kutib, yana bosing.', ru: 'Движок речи ещё запускается — подождите секунду и нажмите снова.' },
+  err_failed: {
+    uz: 'Ovozni ijro etib boʻlmadi. Telefon ovozi (media) yoqilganini tekshiring.',
+    ru: 'Не удалось воспроизвести. Проверьте, что включена громкость медиа (кнопка громкости).',
+  },
+  soundDiag: { uz: 'Ovoz diagnostikasi', ru: 'Диагностика звука' },
+  voiceSettings: { uz: 'Nutq sintezi sozlamalari', ru: 'Настройки синтеза речи' },
   // обновления и APK
   getAndroid: { uz: 'Android ilovasini oʻrnating', ru: 'Установите Android-приложение' },
   getAndroidHint: { uz: 'Internetsiz ishlaydi, ovoz telefonning oʻzida', ru: 'Работает без интернета, голос — с телефона' },

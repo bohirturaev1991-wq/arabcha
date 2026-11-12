@@ -1702,3 +1702,18 @@ select {
 .settings input[type='range'] {
   width: 100%;
 }
+.sound-err {
+  position: sticky;
+  top: 60px;
+  z-index: 5;
+  box-shadow: var(--shadow);
+}
+.diag {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.75rem;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 0;
+}

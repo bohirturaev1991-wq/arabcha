@@ -1,12 +1,18 @@
+import { useEffect, useState } from 'react';
 import { useT } from '../i18n';
-import { Ar, VoiceCheck } from '../components';
+import { Ar, VoiceCheck, say } from '../components';
 import { useStore, setState, resetState, type Lang, type Level } from '../store';
-import { speak, installVoice, canInstallVoice } from '../speak';
+import { installVoice, canInstallVoice, voiceInfo } from '../speak';
 import { APK_URL, isNative } from '../update';
 
 export default function Settings() {
   const { t } = useT();
   const p = useStore((s) => s.profile);
+  const [diag, setDiag] = useState<string[]>([]);
+  const refresh = () => voiceInfo().then(setDiag);
+  useEffect(() => {
+    refresh();
+  }, []);
   const set = (patch: Partial<typeof p>) => setState((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
 
   return (
@@ -49,7 +55,7 @@ export default function Settings() {
           <Ar>مَرْحَبًا، كَيْفَ حَالُكَ؟</Ar>
         </p>
         <div className="row">
-          <button className="btn" onClick={() => speak('مَرْحَبًا، كَيْفَ حَالُكَ؟').catch(() => {})}>
+          <button className="btn" onClick={() => say('مَرْحَبًا، كَيْفَ حَالُكَ؟').finally(refresh)}>
             🔊 {t('testVoice')}
           </button>
           {canInstallVoice() && (
@@ -58,6 +64,8 @@ export default function Settings() {
             </button>
           )}
         </div>
+        <h3>🔧 {t('soundDiag')}</h3>
+        <pre className="diag">{diag.join('\n')}</pre>
       </div>
       <div className="card">
         <button

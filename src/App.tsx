@@ -3,6 +3,7 @@ import { checkUpdate, downloadApk, isAndroidBrowser } from './update';
 import { useRoute, href } from './router';
 import { useStore, setState, type Lang } from './store';
 import { useT, type Key } from './i18n';
+import { SoundErrorBanner } from './components';
 import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
 import Alphabet, { LetterPage } from './pages/Alphabet';
@@ -108,6 +109,7 @@ export default function App() {
       </nav>
       <main className="content">
         <UpdateBanner />
+        <SoundErrorBanner />
         {body}
       </main>
     </div>

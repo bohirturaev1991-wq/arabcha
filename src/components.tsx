@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { useBackClose } from './back';
-import { speak, hasArabicVoice, installVoice, canInstallVoice, type SpeakSpeed } from './speak';
+import { speak, hasArabicVoice, installVoice, canInstallVoice, SpeakError, type SpeakSpeed, type VoiceError } from './speak';
 import { bump, useStore } from './store';
 import { useT } from './i18n';
 import { trOf } from './translit';
@@ -15,15 +15,64 @@ export function Ar({ children, size }: { children: ReactNode; size?: number }) {
   );
 }
 
+// ---- общая плашка «почему нет звука» ----
+let soundErr: VoiceError | null = null;
+const errSubs = new Set<() => void>();
+export function reportSoundError(e: unknown) {
+  soundErr = e instanceof SpeakError ? e.kind : 'failed';
+  errSubs.forEach((f) => f());
+}
+function clearSoundError() {
+  soundErr = null;
+  errSubs.forEach((f) => f());
+}
+/** Нажатие «прослушать» с понятным сообщением при ошибке. */
+export function say(text: string, sp: SpeakSpeed = 'normal') {
+  return speak(text, sp)
+    .then(() => {
+      if (soundErr) clearSoundError();
+      bump('listened');
+    })
+    .catch(reportSoundError);
+}
+
+export function SoundErrorBanner() {
+  const { t } = useT();
+  const err = useSyncExternalStore(
+    (cb) => {
+      errSubs.add(cb);
+      return () => errSubs.delete(cb);
+    },
+    () => soundErr,
+  );
+  if (!err) return null;
+  const key = err === 'noArabic' ? (canInstallVoice() ? 'err_noArabic' : 'err_noArabicWeb') : err === 'notReady' ? 'err_notReady' : err === 'noTts' ? 'err_noArabicWeb' : 'err_failed';
+  return (
+    <div className="notice warn sound-err" role="alert">
+      <span>🔇 {t(key)}</span>
+      <div className="row">
+        {err === 'noArabic' && canInstallVoice() && (
+          <button className="btn small primary" onClick={() => installVoice()}>
+            {t('installVoice')}
+          </button>
+        )}
+        <a className="btn small" href="#/settings" onClick={clearSoundError}>
+          {t('soundDiag')}
+        </a>
+        <button className="btn small ghost" onClick={clearSoundError}>
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** Кнопка «прослушать» (обычно и медленно). */
 export function Play({ text, small, slow = true }: { text: string; small?: boolean; slow?: boolean }) {
   const { t } = useT();
-  const [err, setErr] = useState(false);
   const go = (sp: SpeakSpeed) => (e: React.MouseEvent) => {
     e.stopPropagation();
-    speak(text, sp)
-      .then(() => bump('listened'))
-      .catch(() => setErr(true));
+    say(text, sp);
   };
   return (
     <span className={'play' + (small ? ' small' : '')}>
@@ -35,7 +84,6 @@ export function Play({ text, small, slow = true }: { text: string; small?: boole
           🐢
         </button>
       )}
-      {err && <span className="muted small">✕</span>}
     </span>
   );
 }

@@ -1,9 +1,9 @@
 import { useStore, setState } from '../store';
 import { useT } from '../i18n';
-import { Ar, Play, Tr, VoiceCheck } from '../components';
+import { Ar, Play, Tr, VoiceCheck, say } from '../components';
 import { HARAKAT } from '../data/harakat';
 import { LETTERS } from '../data/letters';
-import { speak } from '../speak';
+
 
 // таблица «буква × огласовка» для тренировки чтения слогов
 const DRILL = ['ba', 'ta', 'tha', 'jim', 'dal', 'ra', 'sin', 'mim', 'nun', 'lam', 'kaf', 'qaf'];
@@ -26,7 +26,7 @@ export default function Harakat() {
       {HARAKAT.map((h) => (
         <section key={h.id} className={'card haraka' + (done[h.id] ? ' done' : '')}>
           <div className="haraka-head">
-            <button className="haraka-sign" onClick={() => speak(h.sign.split(' ')[0], 'slow')}>
+            <button className="haraka-sign" onClick={() => say(h.sign.split(' ')[0], 'slow')}>
               <Ar size={56}>{h.sign}</Ar>
             </button>
             <div>
@@ -72,7 +72,7 @@ export default function Harakat() {
                   const ar = l.ar + v.s;
                   return (
                     <td key={v.v}>
-                      <button className="syl-cell" onClick={() => speak(ar, 'slow')}>
+                      <button className="syl-cell" onClick={() => say(ar, 'slow')}>
                         <Ar size={32}>{ar}</Ar>
                         <span dir="ltr" className="small">
                           <Tr latin={(l.id === 'ya' ? 'y' : l.sound) + v.v} />
