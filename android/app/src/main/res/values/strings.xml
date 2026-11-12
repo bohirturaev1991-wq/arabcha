@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Arabcha</string>
+    <string name="title_activity_main">Arabcha</string>
+    <string name="package_name">uz.arabcha.app</string>
+    <string name="custom_url_scheme">uz.arabcha.app</string>
+</resources>
