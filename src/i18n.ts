@@ -97,6 +97,13 @@ const dict = {
   again2: { uz: 'Yana', ru: 'Ещё раз' },
   finish: { uz: 'Yakunlash', ru: 'Завершить' },
   question: { uz: 'Savol', ru: 'Вопрос' },
+  // обновления и APK
+  getAndroid: { uz: 'Android ilovasini oʻrnating', ru: 'Установите Android-приложение' },
+  getAndroidHint: { uz: 'Internetsiz ishlaydi, ovoz telefonning oʻzida', ru: 'Работает без интернета, голос — с телефона' },
+  updateDownload: { uz: 'Yuklab olish', ru: 'Скачать' },
+  updateAvailable: { uz: 'Yangi versiya chiqdi', ru: 'Доступна новая версия' },
+  updateHint: { uz: 'Yuklab oling va oʻrnating — progress saqlanadi', ru: 'Скачайте и установите — прогресс сохранится' },
+  apk: { uz: 'Android ilovasi (APK)', ru: 'Android-приложение (APK)' },
 } satisfies Record<string, { uz: string; ru: string }>;
 
 export type Key = keyof typeof dict;

@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { checkUpdate, downloadApk, isAndroidBrowser } from './update';
 import { useRoute, href } from './router';
 import { useStore, setState, type Lang } from './store';
 import { useT, type Key } from './i18n';
@@ -105,7 +106,59 @@ export default function App() {
           </a>
         ))}
       </nav>
-      <main className="content">{body}</main>
+      <main className="content">
+        <UpdateBanner />
+        {body}
+      </main>
+    </div>
+  );
+}
+
+const HIDE_KEY = 'arabcha:getapp-hidden';
+
+/** В приложении — «есть новая версия»; на сайте в Android — «установите приложение». */
+function UpdateBanner() {
+  const { t } = useT();
+  const [latest, setLatest] = useState<number | null>(null);
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return isAndroidBrowser() && !!localStorage.getItem(HIDE_KEY);
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    const run = () => checkUpdate().then(setLatest);
+    run();
+    window.addEventListener('online', run);
+    return () => window.removeEventListener('online', run);
+  }, []);
+  const web = isAndroidBrowser();
+  if (hidden || (!web && !latest)) return null;
+  return (
+    <div className="update-banner" role="status">
+      <div>
+        <strong>{web ? t('getAndroid') : t('updateAvailable')}</strong>
+        <div className="small">{web ? t('getAndroidHint') : t('updateHint')}</div>
+      </div>
+      <div className="row">
+        <button className="btn primary" onClick={downloadApk}>
+          ⬇ {t('updateDownload')}
+        </button>
+        <button
+          className="btn ghost"
+          onClick={() => {
+            try {
+              if (web) localStorage.setItem(HIDE_KEY, '1');
+            } catch {
+              /* ignore */
+            }
+            setHidden(true);
+          }}
+        >
+          ✕
+        </button>
+      </div>
     </div>
   );
 }

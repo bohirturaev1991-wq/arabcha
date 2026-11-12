@@ -2,6 +2,7 @@ import { useT } from '../i18n';
 import { Ar, VoiceCheck } from '../components';
 import { useStore, setState, resetState, type Lang, type Level } from '../store';
 import { speak, installVoice, canInstallVoice } from '../speak';
+import { APK_URL, isNative } from '../update';
 
 export default function Settings() {
   const { t } = useT();
@@ -68,6 +69,11 @@ export default function Settings() {
           {t('reset')}
         </button>
       </div>
+      {!isNative() && (
+        <a className="btn wide" href={APK_URL}>
+          ⬇ {t('apk')}
+        </a>
+      )}
       <p className="muted small center">build {__BUILD__}</p>
     </div>
   );
