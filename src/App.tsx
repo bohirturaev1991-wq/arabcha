@@ -12,6 +12,8 @@ import Vocabulary from './pages/Vocabulary';
 import Cards from './pages/Cards';
 import Practice from './pages/Practice';
 import Settings from './pages/Settings';
+import Tajweed from './pages/Tajweed';
+import { stopRecite } from './recite';
 
 const NAV: { path: string; key: Key; icon: string }[] = [
   { path: '/', key: 'home', icon: '⌂' },
@@ -35,6 +37,11 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
+
+  // уходим из раздела таджвида — чтение чтеца останавливаем
+  useEffect(() => {
+    if (parts[0] !== 'tajweed') stopRecite();
+  }, [parts[0]]);
 
   if (!level) return <Onboarding />;
 
@@ -62,6 +69,9 @@ export default function App() {
     case 'practice':
       body = <Practice />;
       break;
+    case 'tajweed':
+      body = <Tajweed sub={parts[1]} arg={parts[2]} />;
+      break;
     case 'settings':
       body = <Settings />;
       break;
@@ -70,7 +80,7 @@ export default function App() {
   }
   const active = (p: string) =>
     p === '/' ? page === '' : '/' + page === p || (p === '/alphabet' && (page === 'letter' || page === 'harakat'));
-  const inner = page === 'letter' || page === 'settings' || page === 'harakat' || (parts.length > 1 && (page === 'words' || page === 'phrases'));
+  const inner = page === 'letter' || page === 'settings' || page === 'harakat' || (parts.length > 1 && (page === 'words' || page === 'phrases' || page === 'tajweed'));
 
   return (
     <div className="shell">

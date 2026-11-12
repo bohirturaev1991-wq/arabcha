@@ -5,7 +5,7 @@ export type Lang = 'uz' | 'ru';
 export type Level = 'zero' | 'some';
 
 export interface State {
-  profile: { lang: Lang; level: Level | null; rate: number; arSize: number };
+  profile: { lang: Lang; level: Level | null; rate: number; arSize: number; reciter?: string };
   letters: Record<string, number>; // выученные буквы → когда
   harakat: Record<string, number>; // пройденные огласовки
   cards: Record<string, CardState>; // интервальное повторение слов и фраз

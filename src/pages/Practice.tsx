@@ -6,20 +6,26 @@ import { ALL_ITEMS } from '../data/words';
 import { setState, bump } from '../store';
 import { speak } from '../speak';
 import { trOf } from '../translit';
+import { getTaj, useTaj } from '../tajData';
+import { Hl, QariButton } from './Tajweed';
 
-type Kind = 'listenLetter' | 'letterName' | 'listenWord' | 'meaning' | 'read';
+type Kind = 'listenLetter' | 'letterName' | 'listenWord' | 'meaning' | 'read' | 'tajweed';
 const KINDS: { id: Kind; icon: string }[] = [
   { id: 'listenLetter', icon: '👂' },
   { id: 'letterName', icon: 'أ' },
   { id: 'listenWord', icon: '🎧' },
   { id: 'meaning', icon: '💡' },
-  { id: 'read', icon: '📖' },
+  { id: 'read', icon: '🔤' },
+  { id: 'tajweed', icon: '📖' },
 ];
 
 interface Q {
   prompt: Key;
   audio?: string; // что произнести
   show?: string; // что показать по-арабски
+  hl?: string; // подсветка (таджвид)
+  ref?: [number, number]; // аят для чтения чтеца
+  explain?: { uz: string; ru: string };
   options: { label: string; ar?: boolean; ok: boolean }[];
 }
 
@@ -34,6 +40,18 @@ const shuffle = <T,>(a: T[]) => {
 const pick = <T,>(a: T[], n: number) => shuffle(a).slice(0, n);
 
 function makeQ(kind: Kind, lang: 'uz' | 'ru'): Q {
+  if (kind === 'tajweed') {
+    const [right, ...wrong] = pick(getTaj()?.rules ?? [], 4);
+    const e = pick(right.ex, 1)[0];
+    return {
+      prompt: 'whatRule',
+      show: e.ar,
+      hl: e.hl,
+      ref: e.ref,
+      explain: { uz: right.uz + ': ' + e.uz, ru: right.ru + ': ' + e.ru },
+      options: shuffle([right, ...wrong].map((r) => ({ label: r[lang], ok: r === right }))),
+    };
+  }
   if (kind === 'listenLetter' || kind === 'letterName') {
     const [right, ...wrong] = pick(LETTERS, 4);
     const opts = [right, ...wrong].map((l) => ({
@@ -58,6 +76,7 @@ const ROUND = 10;
 
 export default function Practice() {
   const { t, lang } = useT();
+  const taj = useTaj();
   const [kind, setKind] = useState<Kind | null>(null);
   const [q, setQ] = useState<Q | null>(null);
   const [n, setN] = useState(0);
@@ -77,13 +96,13 @@ export default function Practice() {
     if (q?.audio && (kind === 'listenLetter' || kind === 'listenWord')) speak(q.audio).catch(() => {});
   }, [q]);
 
-  if (!kind || !q) {
+  if (!kind || !q || (kind === 'tajweed' && !taj)) {
     return (
       <div className="page">
         <VoiceCheck />
         <h1>{t('practice')}</h1>
         <div className="topic-grid">
-          {KINDS.map((k) => (
+          {KINDS.filter((k) => k.id !== 'tajweed' || taj).map((k) => (
             <button key={k.id} className="card topic" onClick={() => start(k.id)}>
               <span className="topic-icon">{k.icon}</span>
               <b>{t(('ex_' + k.id) as Key)}</b>
@@ -141,7 +160,7 @@ export default function Practice() {
       </div>
       <div className="card quiz">
         <h3>{t(q.prompt)}</h3>
-        {q.show && <Ar size={kind === 'letterName' ? 90 : 44}>{q.show}</Ar>}
+        {q.show && (q.hl ? <Hl ar={q.show} hl={q.hl} size={44} /> : <Ar size={kind === 'letterName' ? 90 : 44}>{q.show}</Ar>)}
         {q.audio && (listenOnly || chosen !== null) && <Play text={q.audio} />}
       </div>
       <div className={'options' + (q.options.some((o) => o.ar) ? ' ar-options' : '')}>
@@ -158,6 +177,8 @@ export default function Practice() {
         <>
           <div className={'notice ' + (q.options[chosen].ok ? 'ok' : 'warn')}>
             {q.options[chosen].ok ? t('correct') : t('wrong')}
+            {q.explain && <div className="hint">{q.explain[lang]}</div>}
+            {q.ref && <QariButton s={q.ref[0]} a={q.ref[1]} />}
             {kind !== 'letterName' && kind !== 'listenLetter' && q.audio && (
               <AnswerHint ar={q.audio} />
             )}

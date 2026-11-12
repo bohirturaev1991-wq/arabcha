@@ -4,6 +4,7 @@ import { Ar, Progress, VoiceCheck } from '../components';
 import { LETTERS } from '../data/letters';
 import { HARAKAT } from '../data/harakat';
 import { ALL_ITEMS } from '../data/words';
+import { useTaj } from '../tajData';
 
 export default function Home() {
   const { t } = useT();
@@ -14,17 +15,19 @@ export default function Home() {
   const due = Object.values(s.cards).filter((c) => c.due <= now).length;
   const seen = Object.keys(s.cards).length;
   const days = streak(s);
+  const taj = useTaj();
 
   const steps: { href: string; icon: string; title: Key; hint: Key; done: number; total: number }[] = [
     { href: '#/alphabet', icon: 'أ', title: 'alphabet', hint: 'step1', done: letters, total: LETTERS.length },
     { href: '#/harakat', icon: 'ـَ', title: 'harakat', hint: 'step2', done: har, total: HARAKAT.length },
-    { href: '#/words', icon: '📖', title: 'words', hint: 'step3', done: 0, total: 0 },
+    { href: '#/words', icon: '🗣', title: 'words', hint: 'step3', done: 0, total: 0 },
     { href: '#/phrases', icon: '💬', title: 'phrases', hint: 'step4', done: 0, total: 0 },
     { href: '#/cards', icon: '🗂', title: 'cards', hint: 'step5', done: seen, total: ALL_ITEMS.length },
     { href: '#/practice', icon: '🎯', title: 'practice', hint: 'step6', done: 0, total: 0 },
+    { href: '#/tajweed', icon: '📖', title: 'tajweed', hint: 'step7', done: 0, total: 0 },
   ];
   // у кого есть база — сначала слова и фразы
-  const order = s.profile.level === 'some' ? [2, 3, 4, 5, 0, 1] : [0, 1, 2, 3, 4, 5];
+  const order = (s.profile.level === 'some' ? [2, 3, 4, 5, 6, 0, 1] : [0, 1, 2, 3, 4, 5, 6]).filter((i) => i !== 6 || taj);
 
   return (
     <div className="page">

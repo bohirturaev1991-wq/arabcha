@@ -3,6 +3,7 @@ import { useT } from '../i18n';
 import { Ar, Play, Tr, VoiceCheck, say } from '../components';
 import { HARAKAT } from '../data/harakat';
 import { LETTERS } from '../data/letters';
+import { useTaj } from '../tajData';
 
 
 // таблица «буква × огласовка» для тренировки чтения слогов
@@ -16,6 +17,7 @@ const VOWELS = [
 export default function Harakat() {
   const { t, lang } = useT();
   const done = useStore((s) => s.harakat);
+  const taj = useTaj();
   const letters = DRILL.map((id) => LETTERS.find((l) => l.id === id)!).filter(Boolean);
 
   return (
@@ -86,6 +88,11 @@ export default function Harakat() {
           </tbody>
         </table>
       </div>
+      {taj && (
+        <a className="btn primary wide" href="#/tajweed">
+          📖 {t('tajweed')} →
+        </a>
+      )}
     </div>
   );
 }

@@ -1717,3 +1717,127 @@ select {
   padding: 8px;
   margin: 0;
 }
+/* tajweed */
+.taj-hl {
+  background: #ffe58a;
+  color: #8a2b00;
+  border-radius: 4px;
+  padding: 0 1px;
+}
+@media (prefers-color-scheme: dark) {
+  .taj-hl {
+    background: #5a4600;
+    color: #ffd9a8;
+  }
+}
+.taj-group {
+  display: grid;
+  gap: 8px;
+}
+.taj-rule {
+  padding: 0;
+}
+.taj-head {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.taj-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+.taj-body p {
+  margin: 0;
+}
+.taj-ex {
+  display: grid;
+  gap: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.taj-ex > .ar {
+  text-align: right;
+}
+.taj-ex-body {
+  display: grid;
+}
+.taj-ex .qari {
+  justify-self: start;
+}
+.qari.on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.reciter {
+  display: grid;
+  gap: 4px;
+}
+.reciter select {
+  font: inherit;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.waqf {
+  display: grid;
+  gap: 6px;
+}
+.waqf-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.waqf-row .ar {
+  text-align: center;
+  color: var(--primary);
+}
+.center-row {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.basmala {
+  text-align: center;
+}
+.ayah {
+  display: grid;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+}
+.ayah.on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.ayah-ar {
+  text-align: right;
+  line-height: 2.2;
+}
+.ayah-num {
+  display: inline-block;
+  font-size: 0.6em;
+  border: 1.5px solid var(--accent);
+  border-radius: 99px;
+  min-width: 1.7em;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--accent);
+}
+.ayah-play {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+}

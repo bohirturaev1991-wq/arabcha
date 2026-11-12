@@ -4,6 +4,7 @@ import { Ar, VoiceCheck, say } from '../components';
 import { useStore, setState, resetState, type Lang, type Level } from '../store';
 import { installVoice, canInstallVoice, voiceInfo } from '../speak';
 import { APK_URL, isNative } from '../update';
+import { useTaj, installTaj, removeTaj } from '../tajData';
 
 export default function Settings() {
   const { t } = useT();
@@ -67,6 +68,7 @@ export default function Settings() {
         <h3>🔧 {t('soundDiag')}</h3>
         <pre className="diag">{diag.join('\n')}</pre>
       </div>
+      <ExtraSection />
       <div className="card">
         <button
           className="btn danger"
@@ -83,6 +85,43 @@ export default function Settings() {
         </a>
       )}
       <p className="muted small center">build {__BUILD__}</p>
+    </div>
+  );
+}
+
+/** Личный раздел: подключается файлом, в публичном коде его содержимого нет. */
+function ExtraSection() {
+  const { t } = useT();
+  const taj = useTaj();
+  const [bad, setBad] = useState(false);
+  const onFile = async (f: File | undefined) => {
+    if (!f) return;
+    const ok = installTaj(await f.text());
+    setBad(!ok);
+    if (ok) location.hash = '#/tajweed';
+  };
+  return (
+    <div className="card extra">
+      <h3>🔒 {t('extra')}</h3>
+      {taj ? (
+        <div className="row">
+          <a className="btn primary" href="#/tajweed">
+            {t('extraOn')}
+          </a>
+          <button className="btn ghost" onClick={() => confirm(t('extraRemove') + '?') && removeTaj()}>
+            {t('extraRemove')}
+          </button>
+        </div>
+      ) : (
+        <>
+          <p className="muted small">{t('extraHint')}</p>
+          <label className="btn">
+            📂 {t('extraLoad')}
+            <input type="file" accept=".json,application/json,text/plain,*/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />
+          </label>
+          {bad && <div className="notice warn">{t('extraBad')}</div>}
+        </>
+      )}
     </div>
   );
 }

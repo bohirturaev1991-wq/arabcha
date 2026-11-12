@@ -26,7 +26,22 @@ export default defineConfig({
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' },
         ],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // чтение чтецов: один раз прослушанный аят доступен без интернета
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.hostname === 'everyayah.com',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'recitations',
+              rangeRequests: true,
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 600 },
+            },
+          },
+        ],
+      },
     }),
   ],
 });
